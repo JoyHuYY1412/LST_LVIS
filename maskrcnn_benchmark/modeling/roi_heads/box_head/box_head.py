@@ -21,7 +21,7 @@ class ROIBoxHead(torch.nn.Module):
         self.post_processor = make_roi_box_post_processor(cfg)
         self.loss_evaluator = make_roi_box_loss_evaluator(cfg)
 
-    def forward(self, features, proposals, targets=None, batch_id=None, use_distill=False, img_id=None):
+    def forward(self, features, proposals, targets=None, batch_id=None, generate_distill=False):
         """
         Arguments:
             features (list[Tensor]): feature-maps from possibly several levels
@@ -35,24 +35,23 @@ class ROIBoxHead(torch.nn.Module):
             losses (dict[Tensor]): During training, returns the losses for the
                 head. During testing, returns an empty dict.
         """
-        if use_distill:
-            x = self.feature_extractor(features, proposals)
-            distilled_loss = self.predictor(x, use_distill=use_distill, img_id=img_id)
-            return dict(loss_distill=distilled_loss)
-            # print('class_logits', class_logits.size())
 
         if self.training:
+            print('training')
             # Faster R-CNN subsamples during training the proposals with a fixed
             # positive / negative ratio
             with torch.no_grad():
-#                 print(targets[0].get_field("labels"))
-#                 print(proposals[0].bbox)
-#                 print(targets[0].bbox)
                 proposals = self.loss_evaluator.subsample(proposals, targets, batch_id=batch_id)
-        
+
         # extract features that will be fed to the final classifier. The
         # feature_extractor generally corresponds to the pooler + heads
         x = self.feature_extractor(features, proposals)
+        if generate_distill:
+            # proposals are targets with the ids we want 
+            cosine_simi = self.predictor(x, generate_distill=generate_distill)
+            # print(cosine_simi[:10])
+            return cosine_simi
+
         # final classifier that converts the features into predictions
         class_logits, box_regression = self.predictor(x)
 

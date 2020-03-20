@@ -5,7 +5,7 @@ Implements the Generalized R-CNN framework
 
 import torch
 from torch import nn
-import json
+
 from maskrcnn_benchmark.structures.image_list import to_image_list
 
 from ..backbone import build_backbone
@@ -30,12 +30,8 @@ class GeneralizedRCNN(nn.Module):
         self.rpn = build_rpn(cfg, self.backbone.out_channels)
         self.roi_heads = build_roi_heads(cfg, self.backbone.out_channels)
         self.distill_classes = cfg.MODEL.NUM_DISTILL_CLASSES
-        if cfg.MODEL.USE_DISTILL:
-            self.distill_logits_path = cfg.MODEL.DISTILL_WEIGHTS_FILE
-            with open(self.distill_logits_path, 'r') as f:
-                self.distill_logits = json.load(f)
 
-    def forward(self, images, targets=None, batch_id=None, use_distill=False, img_id=None):
+    def forward(self, images, targets=None, batch_id=None, generate_distill=False):
         """
         Arguments:
             images (list[Tensor] or ImageList): images to be processed
@@ -48,43 +44,30 @@ class GeneralizedRCNN(nn.Module):
                 like `scores`, `labels` and `mask` (for Mask R-CNN models).
 
         """
-        # print('use_distill', use_distill)
-        need_distill = False
-        id_distills = []
-        if use_distill:
-            for id_i, img_id_i in enumerate(img_id):
-                if str(img_id_i) in list(self.distill_logits.keys()):
-                    need_distill = True
-                    id_distills.append(id_i)
-                # when use balance, only part of images need distillation
         if self.training and targets is None:
             raise ValueError("In training mode, targets should be passed")
         images = to_image_list(images)
         features = self.backbone(images.tensors)
+        if generate_distill is True:
+            # print('targets', targets[0].get_field("labels"))
+            for target in targets:
+                print(target.bbox.size())
+                print(target.get_field(
+                    "labels"))
+                target.bbox = target.bbox[target.get_field(
+                    "labels") > self.distill_classes]
+                labels = target.get_field(
+                    "labels")[target.get_field("labels") > self.distill_classes]
+                target.add_field("labels", labels)
+            cosine_simi = self.roi_heads(
+                features, targets, targets, batch_id=batch_id, generate_distill=generate_distill)
+            # print('cosine_simi', cosine_simi.size())
+
+            return cosine_simi
         proposals, proposal_losses = self.rpn(images, features, targets)
         if self.roi_heads:
             x, result, detector_losses = self.roi_heads(
                 features, proposals, targets, batch_id=batch_id)
-            # print('detector_losses', detector_losses)
-            if need_distill:
-                targets_distill = []
-                batch_id_distill = []
-                img_id_distill = []
-                for id_distill in id_distills:
-                    targets_distill.append(targets[id_distill])
-                    batch_id_distill.append(batch_id[id_distill])
-                    img_id_distill.append(img_id[id_distill])
-                for target in targets_distill:
-                    # print(target.bbox.size())
-                    target.bbox = target.bbox[target.get_field(
-                        "labels") > self.distill_classes]
-                    assert target.bbox.size(0) > 0
-                    labels = target.get_field(
-                        "labels")[target.get_field("labels") > self.distill_classes]
-                    target.add_field("labels", labels)
-                    # print('img_id', img_id, target.bbox.size(0))
-                distill_losses = self.roi_heads(
-                    features, targets_distill, targets_distill, batch_id=batch_id_distill, use_distill=use_distill, img_id=img_id_distill)
         else:
             # RPN-only models don't have roi_heads
             x = features
@@ -95,9 +78,6 @@ class GeneralizedRCNN(nn.Module):
             losses = {}
             losses.update(detector_losses)
             losses.update(proposal_losses)
-            if need_distill:
-                losses.update(distill_losses)
-            # print('losses', losses)
             return losses
 
         return result

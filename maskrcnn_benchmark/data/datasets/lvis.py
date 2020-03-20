@@ -35,7 +35,7 @@ def has_valid_annotation(anno):
         return True
     return False
 
-sorted_id_file = "/mnt/data-disk0/db_zhangdong/LVIS/lvis_trainval_1230/lvis_step1_2/lvis_sorted_id_step1.json" #test: head:top 100; tail:500:508->100:108
+sorted_id_file = "/gruntdata0/xinting/project/dataset/LVIS/lvis_trainval_1230/lvis_step1_160/lvis_sorted_id_step1.json" #test: head:top 100; tail:500:508->100:108
 # sorted_id_file = "/mnt/data-disk0/db_zhangdong/LVIS/lvis_trainval_830/lvis_step1_4gpu/lvis_sorted_id_step1.json" # test: head:top 100; tail:500:508->100:108
 with open(sorted_id_file, 'r') as f:
     sorted_id = json.load(f)
@@ -54,7 +54,7 @@ class LVISDataset(torchvision.datasets.coco.CocoDetection):
             ids = []
             for img_id in self.ids:
 #                 ann_ids = self.coco.getAnnIds(imgIds=img_id, catIds=sorted_id[:100], iscrowd=None)
-                ann_ids = self.coco.getAnnIds(imgIds=img_id, catIds=sorted_id, iscrowd=None)
+                ann_ids = self.coco.getAnnIds(imgIds=img_id, catIds=sorted_id[-160:], iscrowd=None)
                 anno = self.coco.loadAnns(ann_ids)
                 if has_valid_annotation(anno):
                     ids.append(img_id)

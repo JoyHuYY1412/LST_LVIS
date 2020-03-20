@@ -21,6 +21,7 @@ from yacs.config import CfgNode as CN
 _C = CN()
 
 _C.MODEL = CN()
+_C.MODEL.GENERATE_DISTILL = False
 _C.MODEL.RPN_ONLY = False
 _C.MODEL.MASK_ON = False
 _C.MODEL.RETINANET_ON = False
@@ -35,8 +36,6 @@ _C.MODEL.CLS_AGNOSTIC_BBOX_REG = False
 _C.MODEL.WEIGHT = ""
 _C.MODEL.QRY_BALANCE = False
 _C.MODEL.QRY_INDICE_CLS = ""
-_C.MODEL.USE_DISTILL = True
-_C.MODEL.DISTILL_WEIGHTS_FILE = ""
 _C.MODEL.NUM_DISTILL_CLASSES = 270
 # -----------------------------------------------------------------------------
 # INPUT

@@ -93,7 +93,7 @@ class FastRCNNLossComputation(object):
         """
 
         labels, regression_targets = self.prepare_targets(proposals, targets)
-        sampled_pos_inds, sampled_neg_inds = self.fg_bg_sampler(labels, batch_id=batch_id, stage='box')
+        sampled_pos_inds, sampled_neg_inds = self.fg_bg_sampler(labels, batch_id=batch_id)
 
         proposals = list(proposals)
         # add corresponding label and regression_targets information to the bounding boxes

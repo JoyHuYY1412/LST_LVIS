@@ -5,7 +5,6 @@ from maskrcnn_benchmark.modeling import registry
 import torch
 from torch import nn
 import torch.nn.functional as F
-import json
 
 
 @registry.ROI_BOX_PREDICTOR.register("FastRCNNPredictor")
@@ -73,19 +72,16 @@ class FPNCosinePredictor(nn.Module):
         self.cls_score = nn.Linear(
             representation_size, num_classes, bias=False)
         num_bbox_reg_classes = 2 if cfg.MODEL.CLS_AGNOSTIC_BBOX_REG else num_classes
-        self.bbox_pred = nn.Linear(representation_size, num_bbox_reg_classes * 4)
+        self.bbox_pred = nn.Linear(
+            representation_size, num_bbox_reg_classes * 4)
         # import pdb; pdb.set_trace()
-        self.scale_cls = nn.Parameter(torch.FloatTensor(1).fill_(cfg.MODEL.FEW_SHOT.ScaleCls), requires_grad=True)
-        if cfg.MODEL.USE_DISTILL:
-            self.distill_logits_path = cfg.MODEL.DISTILL_WEIGHTS_FILE
-            with open(self.distill_logits_path, 'r') as f:
-                self.distill_logits = json.load(f)
-            self.num_distill_classes = cfg.MODEL.NUM_DISTILL_CLASSES
+        self.scale_cls = nn.Parameter(torch.FloatTensor(1).fill_(
+            cfg.MODEL.FEW_SHOT.ScaleCls), requires_grad=True)
         nn.init.normal_(self.cls_score.weight, std=0.01)
         nn.init.normal_(self.bbox_pred.weight, std=0.001)
         nn.init.constant_(self.bbox_pred.bias, 0)
 
-    def forward(self, x, use_distill=False, img_id=None):
+    def forward(self, x, generate_distill):
         if x.ndimension() == 4:
             assert list(x.shape[2:]) == [1, 1]
             x = x.view(x.size(0), -1)
@@ -93,24 +89,10 @@ class FPNCosinePredictor(nn.Module):
         x = F.normalize(x, p=2, dim=x.dim() - 1, eps=1e-12)
         cls_weights = F.normalize(
             self.cls_score.weight, p=2, dim=self.cls_score.weight.dim() - 1, eps=1e-12)
-        if use_distill:
-            distill_logit = []
-            for img_id_i in img_id:
-                distill_logit.append(torch.tensor(self.distill_logits[str(img_id_i)]))
-            # print('distill_logits_path',self.distill_logits_path)
-            # print(len(self.distill_logits))
-            distill_logit_batch = torch.cat(distill_logit)
-#             print('distill_logit', torch.cat(distill_logit).size())
-            assert x.size(0) == distill_logit_batch.size(0)
-            to_be_distilled = torch.mm(x, cls_weights.transpose(0, 1))[:, 1: self.num_distill_classes + 1]
-            distill_loss = nn.MSELoss(reduction='sum')
-            # print('to_be distilled', to_be_distilled.size())
-            loss_distilled = distill_loss(to_be_distilled, torch.tensor(distill_logit_batch)[:, 1:].to(to_be_distilled.device))/(x.size(0))
-            # print('loss_distilled', loss_distilled)
-            # calculate distillation loss
-            return loss_distilled
         # scores = self.scale_cls*torch.baddbmm(1.0,
         # self.bias.view(1,1,1),1.0, x,cls_weights.transpose(1,2))
+        if generate_distill:
+            return torch.mm(x, cls_weights.transpose(0, 1))
         scores = self.scale_cls * torch.mm(x, cls_weights.transpose(0, 1))
         # scores = self.cls_score(x)
 

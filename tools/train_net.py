@@ -38,6 +38,13 @@ def train(cfg, local_rank, distributed, use_tensorboard=False):
     model = build_detection_model(cfg)
     device = torch.device(cfg.MODEL.DEVICE)
     model.to(device)
+    # model.eval()
+
+    # for param in model.parameters():#nn.Module有成员函数parameters()
+    #     param.requires_grad = False
+    # model.roi_heads.train()
+    # for param in model.roi_heads.parameters():
+    #     param.requires_grad = True
 
     optimizer = make_optimizer(cfg, model)
     scheduler = make_lr_scheduler(cfg, optimizer)
@@ -66,12 +73,7 @@ def train(cfg, local_rank, distributed, use_tensorboard=False):
     extra_checkpoint_data = checkpointer.load(cfg.MODEL.WEIGHT)
     arguments.update(extra_checkpoint_data)
 
-    data_loader = make_data_loader(
-        cfg,
-        is_train=True,
-        is_distributed=distributed,
-        start_iter=arguments["iteration"],
-    )
+    data_loader = make_data_loader(cfg, is_train=False, is_distributed=distributed, is_for_period=True)
 
     test_period = cfg.SOLVER.TEST_PERIOD
     if test_period > 0:
@@ -95,7 +97,7 @@ def train(cfg, local_rank, distributed, use_tensorboard=False):
     else:
         meters = MetricLogger(delimiter="  ")
         meters_val = MetricLogger(delimiter="  ")
-
+    # import pdb; pdb.set_trace()
     do_train(
         cfg,
         model,
@@ -222,8 +224,8 @@ def main():
         use_tensorboard=args.use_tensorboard
     )
 
-    if not args.skip_test:
-        run_test(cfg, model, args.distributed)
+    # if not args.skip_test:
+    #     run_test(cfg, model, args.distributed)
 
 
 if __name__ == "__main__":

@@ -16,7 +16,7 @@ class BalancedPositiveNegativeSampler(object):
         self.batch_size_per_image = batch_size_per_image
         self.positive_fraction = positive_fraction
 
-    def __call__(self, matched_idxs, batch_id=None, stage='rpn'):
+    def __call__(self, matched_idxs, batch_id=None):
         """
         Arguments:
             matched idxs: list of tensors containing -1, 0 or positive values.
@@ -35,27 +35,13 @@ class BalancedPositiveNegativeSampler(object):
         pos_idx = []
         neg_idx = []
         for idx, matched_idxs_per_image in enumerate(matched_idxs):
-            if stage=='rpn':
-                #including proposal selection for rpn
+            if not batch_id:
                 positive = torch.nonzero(matched_idxs_per_image >= 1).squeeze(1)
                 negative = torch.nonzero(matched_idxs_per_image == 0).squeeze(1)
-            elif batch_id and stage=='box':
-#                 mask_unseen = matched_idxs_per_image > 270+160
-#                 matched_idxs_per_image[mask_unseen]=0
-                positive = torch.nonzero(matched_idxs_per_image == batch_id[idx]).squeeze(1)
-                if len(positive)==0:
-                    positive = torch.nonzero(matched_idxs_per_image >= 1).squeeze(1)[:10]
-                # print("batch_id", idx, batch_id, torch.unique(matched_idxs_per_image))
-                negative = torch.nonzero(matched_idxs_per_image == 0).squeeze(1)
             else:
-#                 mask_unseen = matched_idxs_per_image > 270+160
-#                 matched_idxs_per_image[mask_unseen]=0
-                positive = torch.nonzero(matched_idxs_per_image >= 271).squeeze(1)
-                # print(matched_idxs_per_image[positive])
-                if len(positive)==0:
-                    positive = torch.nonzero(matched_idxs_per_image >= 1).squeeze(1)[:1]
-#                 print("bbox", torch.unique(matched_idxs_per_image), matched_idxs_per_image[positive], len(matched_idxs_per_image), len(positive))
-                negative = torch.nonzero(matched_idxs_per_image == 0).squeeze(1)  
+                positive = torch.nonzero(matched_idxs_per_image == batch_id[idx]).squeeze(1)
+#                 print("batch_id", idx, batch_id, torch.unique(matched_idxs_per_image), positive)
+                negative = torch.nonzero(matched_idxs_per_image == 0).squeeze(1)
             num_pos = int(self.batch_size_per_image * self.positive_fraction)
             # protect against not enough positive examples
             num_pos = min(positive.numel(), num_pos)
@@ -82,8 +68,5 @@ class BalancedPositiveNegativeSampler(object):
 
             pos_idx.append(pos_idx_per_image_mask)
             neg_idx.append(neg_idx_per_image_mask)
-            # if stage=='box':
-            #     print("pos_idx",len(pos_idx_per_image))
-            #     print("neg_idx",len(neg_idx_per_image))
 
         return pos_idx, neg_idx

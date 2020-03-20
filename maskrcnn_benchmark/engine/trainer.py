@@ -3,7 +3,7 @@ import datetime
 import logging
 import os
 import time
-
+import numpy as np
 import torch
 import torch.distributed as dist
 from tqdm import tqdm
@@ -12,7 +12,7 @@ from maskrcnn_benchmark.data import make_data_loader
 from maskrcnn_benchmark.utils.comm import get_world_size, synchronize
 from maskrcnn_benchmark.utils.metric_logger import MetricLogger
 from maskrcnn_benchmark.engine.inference import inference
-
+import pickle
 from apex import amp
 import json
 
@@ -76,27 +76,107 @@ def do_train(
     if cfg.MODEL.KEYPOINT_ON:
         iou_types = iou_types + ("keypoints",)
     dataset_names = cfg.DATASETS.TEST
-    rank = dist.get_rank()
+    # rank = dist.get_rank()
 
-    for iteration, (images, targets, img_id) in enumerate(data_loader, start_iter):
-#         print(img_id)
+    if cfg.MODEL.GENERATE_DISTILL:
+        model.eval()
+        data_loader = make_data_loader(cfg, is_train=False, is_distributed=(get_world_size() > 1), is_for_period=True)
+        print("len(data_loader)", len(data_loader))
+        cosine_simi_all = {}
+        for _, batch in enumerate(tqdm(data_loader)):
+            images, targets, image_ids = batch
+            # import pdb; pdb.set_trace()
+            print(image_ids)
+            images = images.to(device)
+            targets = [target.to(device) for target in targets]
+            with torch.no_grad():
+                cosine_simi = model(images, targets, generate_distill=True)
+            print("cosine_simi train", cosine_simi.size())
+            assert cosine_simi.size(0) > 0
+            cosine_simi_all[image_ids[0]] = cosine_simi.cpu().tolist()
+            # output_folder = os.path.join(cfg.OUTPUT_DIR, "distilled_logits")
+            # mkdir(output_folder)
+        json.dump(cosine_simi_all, open(os.path.join(cfg.OUTPUT_DIR, "distilled_logits.json"), 'w'))
+        # with open('output_folder', 'wb') as handle:
+        #     pickle.dump(cosine_simi_all, handle,
+        #                 protocol=pickle.HIGHEST_PROTOCOL)
+
+        # with torch.no_grad():
+        #     if timer:
+        #         timer.tic()
+        #     if cfg.TEST.BBOX_AUG.ENABLED:
+        #         output = im_detect_bbox_aug(model, images, device)
+        #     else:
+        #         output = model(images.to(device))
+        #     if timer:
+        #         if not cfg.MODEL.DEVICE == 'cpu':
+        #             torch.cuda.synchronize()
+        #         timer.toc()
+        #     output = [o.to(cpu_device) for o in output]
+        # results_dict.update(
+        #     {img_id: result for img_id, result in zip(image_ids, output)}
+        # )
+        # return results_dict
+        return
+
+        """
+        cosine_simi_all = []
+        print("len(data_loader)", len(data_loader))
+        for iteration, (images, targets, _) in enumerate(data_loader, start_iter):
+            images = images.to(device)
+            targets = [target.to(device) for target in targets]
+            if cfg.MODEL.QRY_BALANCE:
+                batch_id_qry = batch_cls_qry[rank][iteration *
+                                                   2:iteration * 2 + 2]
+                with torch.no_grad():
+                    print("targets", targets, batch_id_qry)
+
+                    cosine_simi = model(
+                        images, targets, batch_id=batch_id_qry, generate_distill=True)
+            else:
+                with torch.no_grad():
+                    cosine_simi = model(images, targets, generate_distill=True)
+            print("cosine_simi train", cosine_simi.size())
+            iteration = iteration + 1
+            # print("iteration", iteration)
+            cosine_simis = [torch.empty_like(cosine_simi)
+                            for i in range(dist.get_world_size())]
+            # dist.all_gather(cosine_simis, cosine_simi)
+            # print(cosine_simis)
+            # print('len(cosine_simis)', len(cosine_simis))
+            cosine_simi_all.append(cosine_simis)
+            # print(cosine_simi_all)
+            # print(len(cosine_simi_all))
+            # model.train()
+
+        output_folder = os.path.join(cfg.OUTPUT_DIR, "distilled_logits")
+        mkdir(output_folder)
+        print('len(cosine_simi_all)', len(cosine_simi_all))
+        with open('output_folder', 'wb') as handle:
+            pickle.dump(cosine_simi_all, handle,
+                        protocol=pickle.HIGHEST_PROTOCOL)
+        # return
+        """
+
+        # np.save(output_folder, np.array(torch.cat(cosine_simi_all).data()))
+
+    for iteration, (images, targets, idx) in enumerate(data_loader, start_iter):
+        # print(idx)
         if any(len(target) < 1 for target in targets):
-            logger.error(f"Iteration={iteration + 1} || Image Ids used for training {img_id} || targets Length={[len(target) for target in targets]}")
+            logger.error(f"Iteration={iteration + 1} || Image Ids used for training {idx} || targets Length={[len(target) for target in targets]}")
             continue
         data_time = time.time() - end
 
         scheduler.step()
         images = images.to(device)
         targets = [target.to(device) for target in targets]
-#         print('batch_id_qry', batch_id_qry, img_id,
+#         print('batch_id_qry', batch_id_qry, idx,
 #               targets[0].extra_fields, targets[1].extra_fields)
         if cfg.MODEL.QRY_BALANCE:
-            # batch_id_qry = batch_cls_qry[rank][iteration * 2:iteration * 2 + 2]
-            # print(img_id)
-            batch_id_qry = [batch_cls_qry[rank][iteration]]
-            loss_dict = model(images, targets, batch_id=batch_id_qry, use_distill=cfg.MODEL.USE_DISTILL, img_id=img_id)
+            batch_id_qry = batch_cls_qry[rank][iteration * 2:iteration * 2 + 2]
+            loss_dict = model(images, targets, batch_id=batch_id_qry)
         else:
-            loss_dict = model(images, targets, use_distill=cfg.MODEL.USE_DISTILL, img_id=img_id[0])
+            loss_dict = model(images, targets)
         losses = sum(loss for loss in loss_dict.values())
 
         iteration = iteration + 1
@@ -145,8 +225,6 @@ def do_train(
         if data_loader_val is not None and test_period > 0 and iteration % test_period == 0:
             # meters_val = MetricLogger(delimiter="  ")
             synchronize()
-            torch.cuda.empty_cache()
-
             output_folder = os.path.join(cfg.OUTPUT_DIR, "Validation")
             mkdir(output_folder)
             res_infer = inference(  # The result can be used for additional logging, e. g. for TensorBoard
@@ -170,23 +248,19 @@ def do_train(
 
             synchronize()
             model.train()
-
-            # the following part can be deleted
-            # with torch.no_grad():
-            #     # Should be one image for each GPU:
-            #     for iteration_val, (images_val, targets_val, _) in enumerate(tqdm(data_loader_val)):
-            #         images_val = images_val.to(device)
-            #         targets_val = [target.to(device) for target in targets_val]
-            #         loss_dict = model(images_val, targets_val)
-            #         losses = sum(loss for loss in loss_dict.values())
-            #         loss_dict_reduced = reduce_loss_dict(loss_dict)
-            #         losses_reduced = sum(
-            #             loss for loss in loss_dict_reduced.values())
-            #         meters_val.update(
-            #             iteration, loss=losses_reduced, **loss_dict_reduced)
-            # synchronize()
-            ####
-
+            """
+            with torch.no_grad():
+                # Should be one image for each GPU:
+                for iteration_val, (images_val, targets_val, _) in enumerate(tqdm(data_loader_val)):
+                    images_val = images_val.to(device)
+                    targets_val = [target.to(device) for target in targets_val]
+                    loss_dict = model(images_val, targets_val)
+                    losses = sum(loss for loss in loss_dict.values())
+                    loss_dict_reduced = reduce_loss_dict(loss_dict)
+                    losses_reduced = sum(loss for loss in loss_dict_reduced.values())
+                    meters_val.update(iteration, loss=losses_reduced, **loss_dict_reduced)
+            synchronize()
+            """
             logger.info(
                 meters_val.delimiter.join(
                     [

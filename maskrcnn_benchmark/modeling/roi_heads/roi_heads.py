@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.
 import torch
-from torch import nn
+
 from .box_head.box_head import build_roi_box_head
 from .mask_head.mask_head import build_roi_mask_head
 from .keypoint_head.keypoint_head import build_roi_keypoint_head
@@ -20,11 +20,15 @@ class CombinedROIHeads(torch.nn.ModuleDict):
         if cfg.MODEL.KEYPOINT_ON and cfg.MODEL.ROI_KEYPOINT_HEAD.SHARE_BOX_FEATURE_EXTRACTOR:
             self.keypoint.feature_extractor = self.box.feature_extractor
 
-    def forward(self, features, proposals, targets=None, batch_id=None, use_distill=False, img_id=None):
+    def forward(self, features, proposals, targets=None, batch_id=None, generate_distill=False):
+        if generate_distill:
+            print('proposals', proposals[0].get_field("labels"))
+            print('targets', targets)
+            # print('batch_id', batch_id)
+            cosine_simi = self.box(features, proposals, targets, batch_id=batch_id, generate_distill=generate_distill)
+
+            return cosine_simi
         losses = {}
-        if use_distill:
-            distill_losses = self.box(features, targets, targets, batch_id=batch_id, use_distill=use_distill, img_id=img_id)
-            return distill_losses
         # TODO rename x to roi_box_features, if it doesn't increase memory consumption
         x, detections, loss_box = self.box(features, proposals, targets, batch_id=batch_id)
         losses.update(loss_box)
@@ -39,16 +43,7 @@ class CombinedROIHeads(torch.nn.ModuleDict):
                 mask_features = x
             # During training, self.box() will return the unaltered proposals as "detections"
             # this makes the API consistent during training and testing
-            if self.cfg.MODEL.ROI_MASK_HEAD.USE_BBOX2MASK:
-                # box_embedding = concat_cls_score_bbox_pred(
-                #     self.box.predictor.cls_score)
-                box_embedding = self.box.predictor.cls_score.weight  # [num_classes, 1024]
-                # print("box_embedding",box_embedding.size())
-                mask_weights = self.bbox2mask(box_embedding)  # mask_weights:[num_classes, 256 ]
-                # print("mask_weights.size()", mask_weights.size())
-                x, detections, loss_mask = self.mask(mask_features, detections, targets, mask_weights.unsqueeze(2).unsqueeze(2))
-            else:
-                x, detections, loss_mask = self.mask(mask_features, detections, targets)
+            x, detections, loss_mask = self.mask(mask_features, detections, targets)
             losses.update(loss_mask)
 
         if self.cfg.MODEL.KEYPOINT_ON:
@@ -78,19 +73,11 @@ def build_roi_heads(cfg, in_channels):
         roi_heads.append(("box", build_roi_box_head(cfg, in_channels)))
     if cfg.MODEL.MASK_ON:
         roi_heads.append(("mask", build_roi_mask_head(cfg, in_channels)))
-    if cfg.MODEL.ROI_MASK_HEAD.USE_BBOX2MASK:
-        # print("in_channels", in_channels)
-        roi_heads.append(("bbox2mask", nn.Sequential(
-                nn.Linear(1024, 1024),
-                nn.LeakyReLU(inplace=True),
-                nn.Linear(1024, 256),
-                nn.LeakyReLU(inplace=True))))
-        # print("in_channels",in_channels)
     if cfg.MODEL.KEYPOINT_ON:
-        roi_heads.append(
-            ("keypoint", build_roi_keypoint_head(cfg, in_channels)))
+        roi_heads.append(("keypoint", build_roi_keypoint_head(cfg, in_channels)))
 
     # combine individual heads in a single module
     if roi_heads:
         roi_heads = CombinedROIHeads(cfg, roi_heads)
+
     return roi_heads
