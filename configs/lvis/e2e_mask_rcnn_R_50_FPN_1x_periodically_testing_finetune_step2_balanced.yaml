@@ -1,0 +1,73 @@
+MODEL:
+  META_ARCHITECTURE: "GeneralizedRCNN"
+  USE_DISTILL: True
+  DISTILL_WEIGHTS_FILE: "/gruntdata0/xinting/project/LVIS/maskxrcnn_get_distillation/distill/distill_logits_step2_w_resample_480/distilled_logits.json"
+  NUM_DISTILL_CLASSES: 750
+  # WEIGHT: "catalog://ImageNetPretrained/MSRA/R-50"
+  WEIGHT: "ckps/ckp-step1_freeze4_w_distill_step1_balance_480/model_0040000_for_finetune.pth"
+  # WEIGHT: "/mnt/data-disk2/xinting/project/maskrcnn/ckp-coco/e2e_mask_rcnn_R_50_FPN_1x_trimmed.pth"
+  QRY_BALANCE: True
+  QRY_INDICE_CLS: "/gruntdata0/xinting/project/dataset/LVIS/lvis_trainval_1230/lvis_step2_4/lvis_classes_qry_step2_rand_balanced.json"
+  
+  BACKBONE:
+    CONV_BODY: "R-50-FPN"
+    FREEZE_CONV_BODY_AT: 4
+  RESNETS:
+    BACKBONE_OUT_CHANNELS: 256
+  RPN:
+    USE_FPN: True
+    ANCHOR_STRIDE: (4, 8, 16, 32, 64)
+    PRE_NMS_TOP_N_TRAIN: 2000
+    PRE_NMS_TOP_N_TEST: 1000
+    POST_NMS_TOP_N_TEST: 1000
+    FPN_POST_NMS_TOP_N_TEST: 1000
+  ROI_HEADS:
+    DETECTIONS_PER_IMG: 300
+    USE_FPN: True
+    SCORE_THRESH: 0.00
+    BATCH_SIZE_PER_IMAGE: 100
+    POSITIVE_FRACTION: 0.5
+  ROI_BOX_HEAD:
+    POOLER_RESOLUTION: 7
+    POOLER_SCALES: (0.25, 0.125, 0.0625, 0.03125)
+    POOLER_SAMPLING_RATIO: 2
+#     PREDICTOR: "FPNPredictor"
+#     FEATURE_EXTRACTOR: "FPN2MLPFeatureExtractor"
+
+    FEATURE_EXTRACTOR: "FPN2MLPCosineFeatureExtractor"
+    PREDICTOR: "FPNCosinePredictor"
+
+    NUM_CLASSES: 1231 #copy 81 classes, the 1st one --background
+  ROI_MASK_HEAD:
+    USE_BBOX2MASK: True
+    USE_MLPMASK: True
+    POOLER_SCALES: (0.25, 0.125, 0.0625, 0.03125)
+    FEATURE_EXTRACTOR: "MaskRCNNFPNFeatureExtractor"
+    PREDICTOR: "MaskRCNNC4Predictor"
+    POOLER_RESOLUTION: 14
+    POOLER_SAMPLING_RATIO: 2
+    RESOLUTION: 28
+    SHARE_BOX_FEATURE_EXTRACTOR: False
+  MASK_ON: True
+  CLS_AGNOSTIC_BBOX_REG: False
+  FEW_SHOT:
+    ScaleCls: 10
+DATASETS:
+  # TRAIN: ("coco_2014_train", "coco_2014_valminusminival")
+  # TEST: ("coco_2014_minival",)
+  # TRAIN: ("lvis_v0.5_minival",)
+  # TEST: ("lvis_v0.5_minival",)
+  TRAIN: ("lvis_v0.5_train_step2",)
+  TEST: ("lvis_v0.5_val_step2",)
+DATALOADER:
+  SIZE_DIVISIBILITY: 32
+SOLVER:
+  BASE_LR: 0.002
+  WEIGHT_DECAY: 0.0001
+  STEPS: (5000, 70000)
+  MAX_ITER: 11000
+  IMS_PER_BATCH: 8
+  TEST_PERIOD: 700  #per 2500 step do validation
+  CHECKPOINT_PERIOD: 700
+OUTPUT_DIR: "./ckps/ckp-step2_freeze4_w_distill_step2_balance_480_3"
+TENSORBOARD_EXPERIMENT: "./logs-step2_freeze4/logs-step2_freeze4_w_distill_step2_balance_480"
