@@ -31,7 +31,8 @@ see [get_finetune_pth.ipynb](get_finetune_pth.ipynb)
 see [README.md](https://github.com/JoyHuYY1412/maskxrcnn_finetune/blob/get_distillation/README.md) for get distillation branch
 
 ## configs to change
-**1. edit [e2e_mask_rcnn_R_101_FPN_1x_periodically_testing_finetune_step1_balanced](https://github.com/JoyHuYY1412/maskxrcnn_finetune/blob/master/configs/lvis/e2e_mask_rcnn_R_101_FPN_1x_periodically_testing_finetune_step1_balanced.yaml)
+
+**1. edit [e2e_mask_rcnn_R_101_FPN_1x_periodically_testing_finetune_step1_balanced](https://github.com/JoyHuYY1412/maskxrcnn_finetune/blob/master/configs/lvis/e2e_mask_rcnn_R_101_FPN_1x_periodically_testing_finetune_step1_balanced.yaml)**
 
 change
 ```python
