@@ -8,10 +8,10 @@ MODEL:
   # WEIGHT: "/mnt/data-disk2/xinting/project/maskrcnn/ckp-coco/e2e_mask_rcnn_R_50_FPN_1x_trimmed.pth"
   QRY_BALANCE: True
   QRY_INDICE_CLS: "/gruntdata0/xinting/project/dataset/LVIS/lvis_trainval_1230/lvis_step1_320/lvis_classes_qry_step1_rand_balanced.json"
-  
+
   BACKBONE:
     CONV_BODY: "R-101-FPN"
-    FREEZE_CONV_BODY_AT: 3
+    FREEZE_CONV_BODY_AT: 4
   RESNETS:
     BACKBONE_OUT_CHANNELS: 256
   RPN:
