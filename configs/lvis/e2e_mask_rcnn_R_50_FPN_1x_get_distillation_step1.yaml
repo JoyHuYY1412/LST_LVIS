@@ -1,14 +1,9 @@
 MODEL:
+  GENERATE_DISTILL: True
   META_ARCHITECTURE: "GeneralizedRCNN"
-  USE_DISTILL: True
-  DISTILL_WEIGHTS_FILE: "/gruntdata0/xinting/project/LVIS/maskxrcnn_get_distillation/distill/distill_logits_step2_w_resample_480/distilled_logits.json"
-  NUM_DISTILL_CLASSES: 750
-  # WEIGHT: "catalog://ImageNetPretrained/MSRA/R-50"
-  WEIGHT: "ckps/ckp-step1_freeze4_w_distill_step1_balance_480/model_0040000_for_finetune.pth"
-  # WEIGHT: "/mnt/data-disk2/xinting/project/maskrcnn/ckp-coco/e2e_mask_rcnn_R_50_FPN_1x_trimmed.pth"
-  QRY_BALANCE: True
-  QRY_INDICE_CLS: "/gruntdata0/xinting/project/dataset/LVIS/lvis_trainval_1230/lvis_step2_4/lvis_classes_qry_step2_rand_balanced.json"
-  
+  WEIGHT: "/mnt/data-disk2/xinting/project/maskxrcnn_finetune/ckps/ckp-top270_freeze2_trained_rpn/model_0150000_for_distill.pth"
+  QRY_BALANCE: False
+  NUM_DISTILL_CLASSES: 270
   BACKBONE:
     CONV_BODY: "R-50-FPN"
     FREEZE_CONV_BODY_AT: 4
@@ -25,7 +20,7 @@ MODEL:
     DETECTIONS_PER_IMG: 300
     USE_FPN: True
     SCORE_THRESH: 0.00
-    BATCH_SIZE_PER_IMAGE: 100
+    BATCH_SIZE_PER_IMAGE: 256
     POSITIVE_FRACTION: 0.5
   ROI_BOX_HEAD:
     POOLER_RESOLUTION: 7
@@ -37,7 +32,7 @@ MODEL:
     FEATURE_EXTRACTOR: "FPN2MLPCosineFeatureExtractor"
     PREDICTOR: "FPNCosinePredictor"
 
-    NUM_CLASSES: 1231 #copy 81 classes, the 1st one --background
+    NUM_CLASSES: 271 #copy 81 classes, the 1st one --background
   ROI_MASK_HEAD:
     USE_BBOX2MASK: True
     USE_MLPMASK: True
@@ -57,17 +52,19 @@ DATASETS:
   # TEST: ("coco_2014_minival",)
   # TRAIN: ("lvis_v0.5_minival",)
   # TEST: ("lvis_v0.5_minival",)
-  TRAIN: ("lvis_v0.5_train_step2",)
-  TEST: ("lvis_v0.5_val_step2",)
+  TRAIN: ("lvis_v0.5_train_step1_160",)
+  TEST: ("lvis_v0.5_train_step1_160",)
 DATALOADER:
   SIZE_DIVISIBILITY: 32
 SOLVER:
-  BASE_LR: 0.002
+  BASE_LR: 0.005
   WEIGHT_DECAY: 0.0001
-  STEPS: (5000, 70000)
-  MAX_ITER: 11000
-  IMS_PER_BATCH: 8
-  TEST_PERIOD: 700  #per 2500 step do validation
-  CHECKPOINT_PERIOD: 700
-OUTPUT_DIR: "./ckps/ckp-step2_freeze4_w_distill_step2_balance_480_3"
-TENSORBOARD_EXPERIMENT: "./logs-step2_freeze4/logs-step2_freeze4_w_distill_step2_balance_480"
+  STEPS: (20000, 50000)
+  MAX_ITER: 100000
+  IMS_PER_BATCH: 1
+  TEST_PERIOD: 3000  #per 2500 step do validation
+  CHECKPOINT_PERIOD: 3000
+TEST:
+  IMS_PER_BATCH: 1
+OUTPUT_DIR: "/mnt/data-disk2/xinting/project/maskxrcnn_finetune/distill/distill_step1_160"
+TENSORBOARD_EXPERIMENT: "./logs-step1_freeze4/logs-step1_freeze4_balanced_accu"
