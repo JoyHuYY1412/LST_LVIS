@@ -4,9 +4,10 @@ At the begining of each new step (step_n), get the logits for samples of novel c
 
 ## trim model of last step 
 run
-``bash
+```bash
 python get_distill_model.py -i './model_last_step.pth' -o '././model_last_step_for_distill.pth'
 ```
+
 ## configs to change ><
 **1. edit [e2e_mask_rcnn_R_101_FPN_1x_get_distillation_step_n_stepsize.yaml](https://github.com/JoyHuYY1412/maskxrcnn_finetune/blob/get_distillation/configs/lvis/e2e_mask_rcnn_R_101_FPN_1x_get_distillation_step1_160.yaml)**
 
