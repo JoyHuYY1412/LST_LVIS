@@ -15,6 +15,46 @@ class DatasetCatalog(object):
             "img_dir": "lvis/images/val2017",
             "ann_file": "lvis/annotations/lvis_step1_160/lvis_v0.5_val_step1.json"
         },
+        "lvis_v0.5_train_step2_160": {
+            "img_dir": "lvis/images/train2017",
+            "ann_file": "lvis/annotations/lvis_step2_160/lvis_v0.5_train_step2.json"
+        },
+        "lvis_v0.5_val_step2_160": {
+            "img_dir": "lvis/images/val2017",
+            "ann_file": "lvis/annotations/lvis_step2_160/lvis_v0.5_val_step2.json"
+        },
+        "lvis_v0.5_train_step3_160": {
+            "img_dir": "lvis/images/train2017",
+            "ann_file": "lvis/annotations/lvis_step3_160/lvis_v0.5_train_step3.json"
+        },
+        "lvis_v0.5_val_step3_160": {
+            "img_dir": "lvis/images/val2017",
+            "ann_file": "lvis/annotations/lvis_step3_160/lvis_v0.5_val_step3.json"
+        },
+        "lvis_v0.5_train_step4_160": {
+            "img_dir": "lvis/images/train2017",
+            "ann_file": "lvis/annotations/lvis_step4_160/lvis_v0.5_train_step4.json"
+        },
+        "lvis_v0.5_val_step4_160": {
+            "img_dir": "lvis/images/val2017",
+            "ann_file": "lvis/annotations/lvis_step4_160/lvis_v0.5_val_step4.json"
+        },
+        "lvis_v0.5_train_step5_160": {
+            "img_dir": "lvis/images/train2017",
+            "ann_file": "lvis/annotations/lvis_step5_160/lvis_v0.5_train_step5.json"
+        },
+        "lvis_v0.5_val_step5_160": {
+            "img_dir": "lvis/images/val2017",
+            "ann_file": "lvis/annotations/lvis_step5_160/lvis_v0.5_val_step5.json"
+        },
+        "lvis_v0.5_train_step6_160": {
+            "img_dir": "lvis/images/train2017",
+            "ann_file": "lvis/annotations/lvis_step6_160/lvis_v0.5_train_step6.json"
+        },
+        "lvis_v0.5_val_step6_160": {
+            "img_dir": "lvis/images/val2017",
+            "ann_file": "lvis/annotations/lvis_step6_160/lvis_v0.5_val_step6.json"
+        },        
         "coco_2017_train": {
             "img_dir": "coco/train2017",
             "ann_file": "coco/annotations/instances_train2017.json"

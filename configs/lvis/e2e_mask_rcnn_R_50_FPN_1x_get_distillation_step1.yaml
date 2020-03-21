@@ -1,7 +1,7 @@
 MODEL:
   GENERATE_DISTILL: True
   META_ARCHITECTURE: "GeneralizedRCNN"
-  WEIGHT: "/mnt/data-disk2/xinting/project/maskxrcnn_finetune/ckps/ckp-top270_freeze2_trained_rpn/model_0150000_for_distill.pth"
+  WEIGHT:   ______path_to_model_for_step1_distill________
   QRY_BALANCE: False
   NUM_DISTILL_CLASSES: 270
   BACKBONE:
@@ -32,7 +32,7 @@ MODEL:
     FEATURE_EXTRACTOR: "FPN2MLPCosineFeatureExtractor"
     PREDICTOR: "FPNCosinePredictor"
 
-    NUM_CLASSES: 271 #copy 81 classes, the 1st one --background
+    NUM_CLASSES: 271 
   ROI_MASK_HEAD:
     USE_BBOX2MASK: True
     USE_MLPMASK: True
@@ -48,10 +48,6 @@ MODEL:
   FEW_SHOT:
     ScaleCls: 10
 DATASETS:
-  # TRAIN: ("coco_2014_train", "coco_2014_valminusminival")
-  # TEST: ("coco_2014_minival",)
-  # TRAIN: ("lvis_v0.5_minival",)
-  # TEST: ("lvis_v0.5_minival",)
   TRAIN: ("lvis_v0.5_train_step1_160",)
   TEST: ("lvis_v0.5_train_step1_160",)
 DATALOADER:
@@ -66,5 +62,5 @@ SOLVER:
   CHECKPOINT_PERIOD: 3000
 TEST:
   IMS_PER_BATCH: 1
-OUTPUT_DIR: "/mnt/data-disk2/xinting/project/maskxrcnn_finetune/distill/distill_step1_160"
+OUTPUT_DIR: "./distill/distill_step1_160"
 TENSORBOARD_EXPERIMENT: "./logs-step1_freeze4/logs-step1_freeze4_balanced_accu"
