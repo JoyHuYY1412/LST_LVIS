@@ -7,129 +7,13 @@ import os
 class DatasetCatalog(object):
     DATA_DIR = "datasets"
     DATASETS = {
-        "lvis_v0.5_train": {
-            "img_dir": "lvis/images/train2017",
-            "ann_file": "lvis/annotations/lvis_v0.5_train.json"
-        },
-        "lvis_v0.5_val": {
-            "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/annotations/lvis_v0.5_val.json"
-        },
-        "lvis_v0.5_train_830": {
-            "img_dir": "lvis/images/train2017",
-            "ann_file": "lvis/annotations/lvis_v0.5_train_830.json"
-        },
-        "lvis_v0.5_val_830": {
-            "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/annotations/lvis_v0.5_val_830.json"
-        },
-        "lvis_v0.5_train_top100": {
-            "img_dir": "lvis/images/train2017",
-            "ann_file": "lvis/lvis_v0.5_train_top100.json"
-        },
-        "lvis_v0.5_val_top100": {
-            "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/lvis_v0.5_val_top100.json"
-        },
-        "lvis_v0.5_train_top270": {
-            "img_dir": "lvis/images/train2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_v0.5_train_top270.json"
-        },
-        "lvis_v0.5_val_top270": {
-            "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_v0.5_val_top270.json"
-        },
-        "lvis_v0.5_minival": {
-            "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/annotations/lvis_v0.5_minival_830.json"
-        },
         "lvis_v0.5_train_step1_160": {
             "img_dir": "lvis/images/train2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step1_2/lvis_v0.5_train_step1.json"
+            "ann_file": "lvis/annotations/lvis_step1_160/lvis_v0.5_train_step1.json"
         },
         "lvis_v0.5_val_step1_160": {
             "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step1_2/lvis_v0.5_val_step1.json"
-        },
-         "lvis_v0.5_train_step3_320": {
-            "img_dir": "lvis/images/train2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step3_320/lvis_v0.5_train_step3.json"
-        },
-        "lvis_v0.5_val_step3_320": {
-            "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step3_320/lvis_v0.5_val_step3.json"
-        },
-        "lvis_v0.5_train_step3": {
-            "img_dir": "lvis/images/train2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step3/lvis_v0.5_train_step3.json"
-        },
-        "lvis_v0.5_val_step3": {
-            "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step3/lvis_v0.5_val_step3.json"
-        },
-        "lvis_v0.5_train_step4": {
-            "img_dir": "lvis/images/train2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step4/lvis_v0.5_train_step4.json"
-        },
-        "lvis_v0.5_val_step4": {
-            "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step4/lvis_v0.5_val_step4.json"
-        },
-        "lvis_v0.5_train_step5": {
-            "img_dir": "lvis/images/train2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step5/lvis_v0.5_train_step5.json"
-        },
-        "lvis_v0.5_val_step5": {
-            "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step5/lvis_v0.5_val_step5.json"
-        },
-        "lvis_v0.5_train_step6": {
-            "img_dir": "lvis/images/train2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step6/lvis_v0.5_train_step6.json"
-        },
-        "lvis_v0.5_val_step6": {
-            "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step6/lvis_v0.5_val_step6.json"
-        },
-        "lvis_v0.5_train_step7": {
-            "img_dir": "lvis/images/train2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step7/lvis_v0.5_train_step7.json"
-        },
-        "lvis_v0.5_val_step7": {
-            "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step7/lvis_v0.5_val_step7.json"
-        },
-        "lvis_v0.5_train_step8": {
-            "img_dir": "lvis/images/train2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step8/lvis_v0.5_train_step8.json"
-        },
-        "lvis_v0.5_val_step8": {
-            "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step8/lvis_v0.5_val_step8.json"
-        },
-        "lvis_v0.5_train_step9": {
-            "img_dir": "lvis/images/train2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step9/lvis_v0.5_train_step9.json"
-        },
-        "lvis_v0.5_val_step9": {
-            "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step9/lvis_v0.5_val_step9.json"
-        },
-        "lvis_v0.5_train_step10": {
-            "img_dir": "lvis/images/train2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step10/lvis_v0.5_train_step10.json"
-        },
-        "lvis_v0.5_val_step10": {
-            "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step10/lvis_v0.5_val_step10.json"
-        },
-        "lvis_v0.5_train_step11": {
-            "img_dir": "lvis/images/train2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step11/lvis_v0.5_train_step11.json"
-        },
-        "lvis_v0.5_val_step11": {
-            "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/lvis_trainval_1230/lvis_step11/lvis_v0.5_val_step11.json"
+            "ann_file": "lvis/annotations/lvis_step1_160/lvis_v0.5_val_step1.json"
         },
         "coco_2017_train": {
             "img_dir": "coco/train2017",
