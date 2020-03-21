@@ -87,12 +87,14 @@ edit
 
 edit
 ```python
-   gt_path="datasets/lvis/annotations/lvis_v0.5_val_topb.json",   //line 16
+   indices_qry_json_file = path to lvis_indices_qry_stepn_rand_balanced.json   //line 98
 ```
 
 **6. about [balanced_positive_negative_sampler.py](https://github.com/JoyHuYY1412/maskxrcnn_finetune/blob/master/maskrcnn_benchmark/modeling/balanced_positive_negative_sampler.py)**
 
-currently positive for rpn is those cls_id>270, for roi is those selected
+currently positive samples setting
+for rpn:  those cls_id>270
+for roi: those selected
 
 
 ## code for training
