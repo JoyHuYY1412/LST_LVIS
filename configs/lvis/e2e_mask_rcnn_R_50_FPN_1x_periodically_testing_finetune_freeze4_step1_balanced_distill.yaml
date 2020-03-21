@@ -7,10 +7,10 @@ MODEL:
   WEIGHT: "/mnt/data-disk0/xinting/LVIS/LVIS_new/maskxrcnn_base/ckps/ckp-top270_freeze2_trained_rpn/model_0150000_for_finetune.pth"
   # WEIGHT: "/mnt/data-disk2/xinting/project/maskrcnn/ckp-coco/e2e_mask_rcnn_R_50_FPN_1x_trimmed.pth"
   QRY_BALANCE: True
-  QRY_INDICE_CLS: "/mnt/data-disk0/db_zhangdong/LVIS/lvis_trainval_1230/lvis_step1_2/lvis_classes_qry_step1_rand_balanced.json"
+  QRY_INDICE_CLS: "/mnt/data-disk0/db_zhangdong/LVIS/lvis_trainval_1230/lvis_step1_160/lvis_classes_qry_step1_rand_balanced.json"
   BACKBONE:
     CONV_BODY: "R-50-FPN"
-    FREEZE_CONV_BODY_AT: 2
+    FREEZE_CONV_BODY_AT: 4
   RESNETS:
     BACKBONE_OUT_CHANNELS: 256
   RPN:
@@ -52,10 +52,6 @@ MODEL:
   FEW_SHOT:
     ScaleCls: 10
 DATASETS:
-  # TRAIN: ("coco_2014_train", "coco_2014_valminusminival")
-  # TEST: ("coco_2014_minival",)
-  # TRAIN: ("lvis_v0.5_minival",)
-  # TEST: ("lvis_v0.5_minival",)
   TRAIN: ("lvis_v0.5_train_step1_160",)
   TEST: ("lvis_v0.5_val_step1_160",)
 DATALOADER:
@@ -63,10 +59,10 @@ DATALOADER:
 SOLVER:
   BASE_LR: 0.005
   WEIGHT_DECAY: 0.0001
-  STEPS: (50000, 70000)
-  MAX_ITER: 100000
+  STEPS: (25000, 35000)
+  MAX_ITER: 60000
   IMS_PER_BATCH: 8
   TEST_PERIOD: 5000  #per 2500 step do validation
   CHECKPOINT_PERIOD: 5000
-OUTPUT_DIR: "./ckps/ckp-step1_freeze2_w_distill_balance_160"
-TENSORBOARD_EXPERIMENT: "./logs-step1_freeze2/logs-step1_freeze2_w_distill_balance_160"
+OUTPUT_DIR: "./ckps/ckp-step1_freeze4_w_distill_balance_160"
+TENSORBOARD_EXPERIMENT: "./logs-step1_freeze4/logs-step1_freeze4_w_distill_balance_160"
