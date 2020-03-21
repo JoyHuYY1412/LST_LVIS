@@ -27,7 +27,7 @@ lvis_v0.5_val_stepn.json
 ### trim model for finetune
 run
 ```bash
-python get_finetune_model.py -i './model_last_step.pth' -o './model_last_step_for_finetune.pth' -n stepn
+python get_finetune_pth.py -i './model_last_step.pth' -o './model_last_step_for_finetune.pth' -n stepn
 ```
 
 
