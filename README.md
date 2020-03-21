@@ -14,7 +14,7 @@ python get_distill_model.py -i './model_last_step.pth' -o './model_last_step_for
 change
 ```python
 
-WEIGHT: path of trimmed model for distill //line5
+WEIGHT: 'model_last_step_for_distill.pth' //line5
 
 ```
 
