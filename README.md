@@ -25,7 +25,11 @@ lvis_v0.5_train_stepn.json
 lvis_v0.5_val_stepn.json
 ```
 ### trim model for finetune
-see [get_finetune_pth.ipynb](get_finetune_pth.ipynb)
+run
+```bash
+python get_finetune_model.py -i './model_last_step.pth' -o './model_last_step_for_finetune.pth' -n stepn
+```
+
 
 ## get distillation
 see [README.md](https://github.com/JoyHuYY1412/maskxrcnn_finetune/blob/get_distillation/README.md) for get distillation branch
@@ -55,28 +59,14 @@ ROI_HEADS:
 SOLVER:
 ```
 
-**2. edit [paths_catalog.py](https://github.com/JoyHuYY1412/maskxrcnn_finetune/blob/master/maskrcnn_benchmark/config/paths_catalog.py)**
-
-add
-```python
-        "lvis_v0.5_train_topb": {
-            "img_dir": "lvis/images/train2017",
-            "ann_file": "lvis/annotations/lvis_v0.5_train_topb.json"
-        },
-        "lvis_v0.5_val_topb": {
-            "img_dir": "lvis/images/val2017",
-            "ann_file": "lvis/annotations/lvis_v0.5_val_topb.json"
-        },
-```
-
-**3. edit [lvis.py](https://github.com/JoyHuYY1412/maskxrcnn_finetune/blob/master/maskrcnn_benchmark/data/datasets/lvis.py)**
+**2. edit [lvis.py](https://github.com/JoyHuYY1412/maskxrcnn_finetune/blob/master/maskrcnn_benchmark/data/datasets/lvis.py)**
 
 edit
 ```python
 sorted_id_file = path_to_sorted_id_topb (absolute path) //line 38
 ```
 
-**4. edit [__init__.py](https://github.com/JoyHuYY1412/maskxrcnn_finetune/blob/master/maskrcnn_benchmark/data/datasets/evaluation/lvis/__init__.py)**
+**3. edit [__init__.py](https://github.com/JoyHuYY1412/maskxrcnn_finetune/blob/master/maskrcnn_benchmark/data/datasets/evaluation/lvis/__init__.py)**
 for evaluation
 
 edit
