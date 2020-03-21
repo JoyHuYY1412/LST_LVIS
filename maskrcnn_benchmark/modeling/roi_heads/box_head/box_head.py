@@ -45,7 +45,9 @@ class ROIBoxHead(torch.nn.Module):
             # Faster R-CNN subsamples during training the proposals with a fixed
             # positive / negative ratio
             with torch.no_grad():
-#                 print(targets[0].get_field("labels"))
+                for i in range(len(targets)):
+                    assert batch_id[i] in targets[i].get_field("labels")
+
 #                 print(proposals[0].bbox)
 #                 print(targets[0].bbox)
                 proposals = self.loss_evaluator.subsample(proposals, targets, batch_id=batch_id)

@@ -1,16 +1,15 @@
 MODEL:
   META_ARCHITECTURE: "GeneralizedRCNN"
   USE_DISTILL: True
-  DISTILL_WEIGHTS_FILE: "/mnt/data-disk0/xinting/LVIS/LVIS_new/maskxrcnn_get_distillation/distill/distill_logits_step1_160/distilled_logits.json"
+  DISTILL_WEIGHTS_FILE: './distill/distill_logits_step1_160.json'
   NUM_DISTILL_CLASSES: 270
-  # WEIGHT: "catalog://ImageNetPretrained/MSRA/R-50"
-  WEIGHT: "/mnt/data-disk0/xinting/LVIS/LVIS_new/maskxrcnn_base/ckps/ckp-top270_freeze2_trained_rpn/model_0150000_for_finetune.pth"
+  WEIGHT: 'model_for_finetune_step1'
   # WEIGHT: "/mnt/data-disk2/xinting/project/maskrcnn/ckp-coco/e2e_mask_rcnn_R_50_FPN_1x_trimmed.pth"
   QRY_BALANCE: True
-  QRY_INDICE_CLS: "/mnt/data-disk0/db_zhangdong/LVIS/lvis_trainval_1230/lvis_step1_160/lvis_classes_qry_step1_rand_balanced.json"
+  QRY_INDICE_CLS: "./lvis_classes_qry_step1_rand_balanced.json"
   BACKBONE:
     CONV_BODY: "R-50-FPN"
-    FREEZE_CONV_BODY_AT: 4
+    FREEZE_CONV_BODY_AT: 5
   RESNETS:
     BACKBONE_OUT_CHANNELS: 256
   RPN:
@@ -59,10 +58,10 @@ DATALOADER:
 SOLVER:
   BASE_LR: 0.005
   WEIGHT_DECAY: 0.0001
-  STEPS: (25000, 35000)
-  MAX_ITER: 60000
-  IMS_PER_BATCH: 8
-  TEST_PERIOD: 5000  #per 2500 step do validation
+  STEPS:  
+  MAX_ITER:  
+  IMS_PER_BATCH:  
+  TEST_PERIOD: 5000  
   CHECKPOINT_PERIOD: 5000
-OUTPUT_DIR: "./ckps/ckp-step1_freeze4_w_distill_balance_160"
-TENSORBOARD_EXPERIMENT: "./logs-step1_freeze4/logs-step1_freeze4_w_distill_balance_160"
+OUTPUT_DIR: "./ckps/ckp-step1_freeze5_w_distill_balance_160"
+TENSORBOARD_EXPERIMENT: "./logs-step1_freeze5/logs-step1_freeze5_w_distill_balance_160"

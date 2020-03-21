@@ -91,9 +91,9 @@ def do_train(
 #         print('batch_id_qry', batch_id_qry, img_id,
 #               targets[0].extra_fields, targets[1].extra_fields)
         if cfg.MODEL.QRY_BALANCE:
-            # batch_id_qry = batch_cls_qry[rank][iteration * 2:iteration * 2 + 2]
+            batch_id_qry = batch_cls_qry[rank][iteration * 2:iteration * 2 + 2]
             # print(img_id)
-            batch_id_qry = [batch_cls_qry[rank][iteration]]
+            # batch_id_qry = [batch_cls_qry[rank][iteration]]
             loss_dict = model(images, targets, batch_id=batch_id_qry, use_distill=cfg.MODEL.USE_DISTILL, img_id=img_id)
         else:
             loss_dict = model(images, targets, use_distill=cfg.MODEL.USE_DISTILL, img_id=img_id[0])
