@@ -1,6 +1,7 @@
 # maskxrcnn_finetune -- get distillation
 
 At the begining of each new step (step_n), get the logits for samples of novel classes using previos model (model for step_n-1)
+number of novel classes: stepsize
 
 ## trim model of last step 
 check [get_distill_pth.ipynb](get_distill_pth.ipynb)
@@ -24,10 +25,18 @@ OUTPUT_DIR: ""./dstill/distill_step_n_stepsize"  //line 72
 TENSORBOARD_EXPERIMENT: "./logs"
 ```
 
+**2. edit [lvis.py](https://github.com/JoyHuYY1412/maskxrcnn_finetune/blob/get_distillation/maskrcnn_benchmark/data/datasets/lvis.py)**
+change
+```python
+sorted_id_file: path to sorted_id_file for step_n   //line 38
+step_size: stepsize 
+```
+
+
 ## generate logits
 
-
-
 ```python
+python setup.py build develop
+
 python ./tools/train_net.py --use-tensorboard --config-file "configs/lvis/e2e_mask_rcnn_R_50_FPN_1x_get_distillation_step_n_stepsize.yaml" MODEL.RPN.FPN_POST_NMS_TOP_N_TRAIN 1000
 ```
