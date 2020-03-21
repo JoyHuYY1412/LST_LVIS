@@ -26,9 +26,10 @@ TENSORBOARD_EXPERIMENT: "./logs"
 ```
 
 **2. edit [lvis.py](https://github.com/JoyHuYY1412/maskxrcnn_finetune/blob/get_distillation/maskrcnn_benchmark/data/datasets/lvis.py)**
+
 change
 ```python
-sorted_id_file: path to sorted_id_file for step_n   //line 38
+sorted_id_file: path to sorted_id_file_step_n   //line 38
 step_size: stepsize 
 ```
 
