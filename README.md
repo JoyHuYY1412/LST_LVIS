@@ -1,6 +1,7 @@
 # maskxrcnn_finetune -- get distillation
 
 At the begining of each new step (step_n), get the logits for samples of novel classes using previos model (model for step_n-1)
+
 number of novel classes: stepsize
 
 ## trim model of last step 
