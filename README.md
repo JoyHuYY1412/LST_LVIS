@@ -34,6 +34,8 @@ sorted_id_file: path to sorted_id_file_step_n   //line 38
 step_size: stepsize 
 ```
 
+**3. edit [paths_catalog.py](https://github.com/JoyHuYY1412/maskxrcnn_finetune/blob/get_distillation/maskrcnn_benchmark/config/paths_catalog.py)**
+
 
 ## generate logits
 
