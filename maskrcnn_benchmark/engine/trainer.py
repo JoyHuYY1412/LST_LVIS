@@ -77,11 +77,13 @@ def do_train(
         iou_types = iou_types + ("keypoints",)
     dataset_names = cfg.DATASETS.TEST
 
+
     if cfg.MODEL.GENERATE_DISTILL:
         model.eval()
-        data_loader = make_data_loader(cfg, is_train=False, is_distributed=(get_world_size() > 1), is_for_period=True)
+        cosine_simi_all = [{},{}]
+        flip_prob= 0 #no_flip 
+        data_loader = make_data_loader(cfg, is_train=False, is_distributed=(get_world_size() > 1), is_for_period=True, flip_prob=flip_prob)
         print("len(data_loader)", len(data_loader))
-        cosine_simi_all = {}
         for _, batch in enumerate(tqdm(data_loader)):
             images, targets, image_ids = batch
             print(image_ids)
@@ -91,7 +93,21 @@ def do_train(
                 cosine_simi = model(images, targets, generate_distill=True)
             print("cosine_simi train", cosine_simi.size())
             assert cosine_simi.size(0) > 0
-            cosine_simi_all[image_ids[0]] = cosine_simi.cpu().tolist()
+            cosine_simi_all[0][image_ids[0]] = cosine_simi.cpu().tolist()
+
+        flip_prob = 1 #must_flip 
+        data_loader = make_data_loader(cfg, is_train=False, is_distributed=(get_world_size() > 1), is_for_period=True, flip_prob=flip_prob)
+        print("len(data_loader)", len(data_loader))
+        for _, batch in enumerate(tqdm(data_loader)):
+            images, targets, image_ids = batch
+            print(image_ids)
+            images = images.to(device)
+            targets = [target.to(device) for target in targets]
+            with torch.no_grad():
+                cosine_simi = model(images, targets, generate_distill=True)
+            print("cosine_simi train", cosine_simi.size())
+            assert cosine_simi.size(0) > 0
+            cosine_simi_all[1][image_ids[0]] = cosine_simi.cpu().tolist()
             # output_folder = os.path.join(cfg.OUTPUT_DIR, "distilled_logits")
             # mkdir(output_folder)
         json.dump(cosine_simi_all, open(os.path.join(cfg.OUTPUT_DIR, "distilled_logits.json"), 'w'))
