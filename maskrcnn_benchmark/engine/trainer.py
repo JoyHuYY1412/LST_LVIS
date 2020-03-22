@@ -82,7 +82,7 @@ def do_train(
         model.eval()
         cosine_simi_all = [{},{}]
         flip_prob= 0 #no_flip 
-        data_loader = make_data_loader(cfg, is_train=False, is_distributed=(get_world_size() > 1), is_for_period=True, flip_prob=flip_prob)
+        data_loader = make_data_loader(cfg, is_train=False, is_distill=True, is_distributed=(get_world_size() > 1), is_for_period=True, flip_prob=flip_prob)
         print("len(data_loader)", len(data_loader))
         for _, batch in enumerate(tqdm(data_loader)):
             images, targets, image_ids = batch
@@ -96,7 +96,7 @@ def do_train(
             cosine_simi_all[0][image_ids[0]] = cosine_simi.cpu().tolist()
 
         flip_prob = 1 #must_flip 
-        data_loader = make_data_loader(cfg, is_train=False, is_distributed=(get_world_size() > 1), is_for_period=True, flip_prob=flip_prob)
+        data_loader = make_data_loader(cfg, is_train=False, is_distill=True, is_distributed=(get_world_size() > 1), is_for_period=True, flip_prob=flip_prob)
         print("len(data_loader)", len(data_loader))
         for _, batch in enumerate(tqdm(data_loader)):
             images, targets, image_ids = batch
