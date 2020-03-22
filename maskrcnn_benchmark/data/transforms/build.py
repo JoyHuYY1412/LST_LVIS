@@ -2,8 +2,8 @@
 from . import transforms as T
 
 
-def build_transforms(cfg, is_train=True, flip_prob=0.5):
-    if is_train:
+def build_transforms(cfg, is_train=True, is_distill=False, flip_prob=0.5):
+    if is_train or is_distill:
         min_size = cfg.INPUT.MIN_SIZE_TRAIN
         max_size = cfg.INPUT.MAX_SIZE_TRAIN
         # flip_horizontal_prob = 0.5  # cfg.INPUT.FLIP_PROB_TRAIN
