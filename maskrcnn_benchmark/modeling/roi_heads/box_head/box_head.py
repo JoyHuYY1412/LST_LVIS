@@ -21,7 +21,7 @@ class ROIBoxHead(torch.nn.Module):
         self.post_processor = make_roi_box_post_processor(cfg)
         self.loss_evaluator = make_roi_box_loss_evaluator(cfg)
 
-    def forward(self, features, proposals, targets=None, batch_id=None, use_distill=False, img_id=None):
+    def forward(self, features, proposals, targets=None, batch_id=None, use_distill=False, img_id=None, flips=None):
         """
         Arguments:
             features (list[Tensor]): feature-maps from possibly several levels
@@ -37,7 +37,7 @@ class ROIBoxHead(torch.nn.Module):
         """
         if use_distill:
             x = self.feature_extractor(features, proposals)
-            distilled_loss = self.predictor(x, use_distill=use_distill, img_id=img_id)
+            distilled_loss = self.predictor(x, use_distill=use_distill, img_id=img_id, flips=flips)
             return dict(loss_distill=distilled_loss)
             # print('class_logits', class_logits.size())
 

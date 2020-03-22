@@ -71,6 +71,10 @@ class RandomHorizontalFlip(object):
         if random.random() < self.prob:
             image = F.hflip(image)
             target = target.transpose(0)
+            target.add_field("flip",1)
+        else:
+            target.add_field("flip",0)
+        print(target)
         return image, target
 
 class RandomVerticalFlip(object):

@@ -53,7 +53,7 @@ class GeneralizedRCNN(nn.Module):
         id_distills = []
         if use_distill:
             for id_i, img_id_i in enumerate(img_id):
-                if str(img_id_i) in list(self.distill_logits.keys()):
+                if str(img_id_i) in list(self.distill_logits[0].keys()):
                     need_distill = True
                     id_distills.append(id_i)
                 # when use balance, only part of images need distillation
@@ -70,7 +70,9 @@ class GeneralizedRCNN(nn.Module):
                 targets_distill = []
                 batch_id_distill = []
                 img_id_distill = []
+                flips = []
                 for id_distill in id_distills:
+                    flips.append(targets[id_distill].get_field('flip'))
                     targets_distill.append(targets[id_distill])
                     batch_id_distill.append(batch_id[id_distill])
                     img_id_distill.append(img_id[id_distill])
@@ -84,7 +86,7 @@ class GeneralizedRCNN(nn.Module):
                     target.add_field("labels", labels)
                     # print('img_id', img_id, target.bbox.size(0))
                 distill_losses = self.roi_heads(
-                    features, targets_distill, targets_distill, batch_id=batch_id_distill, use_distill=use_distill, img_id=img_id_distill)
+                    features, targets_distill, targets_distill, batch_id=batch_id_distill, use_distill=use_distill, img_id=img_id_distill, flips=flips)
         else:
             # RPN-only models don't have roi_heads
             x = features

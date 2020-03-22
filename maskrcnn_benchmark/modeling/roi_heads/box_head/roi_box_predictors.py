@@ -85,7 +85,7 @@ class FPNCosinePredictor(nn.Module):
         nn.init.normal_(self.bbox_pred.weight, std=0.001)
         nn.init.constant_(self.bbox_pred.bias, 0)
 
-    def forward(self, x, use_distill=False, img_id=None):
+    def forward(self, x, use_distill=False, img_id=None, flips=None):
         if x.ndimension() == 4:
             assert list(x.shape[2:]) == [1, 1]
             x = x.view(x.size(0), -1)
@@ -95,8 +95,8 @@ class FPNCosinePredictor(nn.Module):
             self.cls_score.weight, p=2, dim=self.cls_score.weight.dim() - 1, eps=1e-12)
         if use_distill:
             distill_logit = []
-            for img_id_i in img_id:
-                distill_logit.append(torch.tensor(self.distill_logits[str(img_id_i)]))
+            for id_i, img_id_i in enumerate(img_id):
+                distill_logit.append(torch.tensor(self.distill_logits[flips[id_i]][str(img_id_i)]))
             # print('distill_logits_path',self.distill_logits_path)
             # print(len(self.distill_logits))
             distill_logit_batch = torch.cat(distill_logit)
@@ -106,7 +106,6 @@ class FPNCosinePredictor(nn.Module):
             distill_loss = nn.MSELoss(reduction='sum')
             # print('to_be distilled', to_be_distilled.size())
             loss_distilled = distill_loss(to_be_distilled, torch.tensor(distill_logit_batch)[:, 1:].to(to_be_distilled.device))/(x.size(0))
-            # print('loss_distilled', loss_distilled)
             # calculate distillation loss
             return loss_distilled
         # scores = self.scale_cls*torch.baddbmm(1.0,
