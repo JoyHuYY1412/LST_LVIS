@@ -35,8 +35,7 @@ def has_valid_annotation(anno):
         return True
     return False
 
-sorted_id_file = "user/project/datasets/lvis/annotations/lvis_sorted_id_base.json" #test: head:top 100; tail:500:508->100:108
-
+sorted_id_file = "user/project/datasets/lvis/annotations/lvis_sorted_id_base.json"
 with open(sorted_id_file, 'r') as f:
     sorted_id = json.load(f)
 
