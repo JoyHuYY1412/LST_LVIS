@@ -95,7 +95,7 @@ class DistributedSamplerFS(Sampler):
         self.dataset = dataset
         self.num_replicas = num_replicas
         self.rank = rank
-        indices_qry_json_file = "/mnt/data-disk0/db_zhangdong/LVIS/lvis_trainval_1230/lvis_step1_2/lvis_indices_qry_step1_rand_balanced.json"
+        indices_qry_json_file = "user/project/datasets/lvis/annotations/lvis_indices_qry_step1_rand_balanced.json"
         with open(indices_qry_json_file, 'r') as f:
             self.indices_all_qry = json.load(f)
 
