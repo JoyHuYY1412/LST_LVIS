@@ -35,7 +35,7 @@ def has_valid_annotation(anno):
         return True
     return False
 
-sorted_id_file = ___path_to_lvis_sorted_id_stepn___ #test: head:top 100; tail:500:508->100:108
+sorted_id_file = ___path_to_lvis_sorted_id_stepn___ 
 step_size = 160
 
 with open(sorted_id_file, 'r') as f:
