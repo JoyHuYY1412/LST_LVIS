@@ -1,10 +1,9 @@
 # Learning to Segment the Tail
-Xinting Hu, Yi Jiang, Kaihua Tang, Jingyuan Chen, Chunyan Miao, Hanwang Zhang
 
 [[`arXiv`](https://arxiv.org/pdf/2004.00900.pdf)] 
 
 <div align="center">
-  <img width="70%", src="https://tztztztztz.github.io/images/eql-gradient.jpg"/>
+  <img width="70%", src="https://github.com/JoyHuYY1412/LST_LVIS/blob/master/illustration.pdf"/>
 </div><br/>
 
 In this repository, we release code for Learning to Segment The Tail (LST). The code is directly modified from the project [maskrcnn_benchmark](https://github.com/facebookresearch/maskrcnn-benchmark), which is an excellent codebase! If you get any problem that cause you unable to run the project, you can check the issues under [maskrcnn_benchmark](https://github.com/facebookresearch/maskrcnn-benchmark) first. 
