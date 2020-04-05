@@ -78,4 +78,4 @@ python -m torch.distributed.launch --nproc_per_node=$NGPUS /path_to_maskrcnn_ben
 We also provide periodically testing to check the result better, as discussed in this [issue](https://github.com/facebookresearch/maskrcnn-benchmark/pull/828).
 
 
-Thanks for all the previos work and the sharing of their codes. Sorry for my ugly code and I appreciate your advice. 
+Thanks for all the previous work and the sharing of their codes. Sorry for my ugly code and I appreciate your advice. 
